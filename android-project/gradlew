@@ -23,6 +23,7 @@
 ##############################################################################
 
 # Attempt to set APP_HOME
+
 # Resolve links: $0 may be a link
 app_path=$0
 
@@ -122,7 +123,7 @@ fi
 #   * args from the command line
 #   * the main class name
 #   * -classpath
-#   * -D...appname settings
+#   * -D...  properties
 #   * --module-path (only if needed)
 #   * DEFAULT_JVM_OPTS, JAVA_OPTS, and GRADLE_OPTS environment variables.
 
@@ -145,8 +146,7 @@ if "$cygwin" || "$msys" ; then
             arg=$( cygpath --path --ignore --mixed "$arg" )
         fi
         # Roll the args list around exactly as many times as the number of
-        # temporary variables assigned, so each argument winds up back in the
-        # position where it started, but possibly modified.
+        # temporary variables.
         shift                   # remove $arg
         set -- "$@" "$arg"      # push $arg onto the end
     done
@@ -157,9 +157,11 @@ fi
 DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
 
 # Collect all arguments for the java command:
-#   * DEFAULT_JVM_OPTS, JAVA_OPTS, GRADLE_OPTS, and GRADLE_WRAPPER_OPTS environment variables.
-#   * Fragment args from the command line
-#   * The main class name
+#   * DEFAULT_JVM_OPTS, JAVA_OPTS, GRADLE_OPTS, and optsEnvironmentVar are not
+#     temporary variables.
+#   * The complex case is that the user has set some JAVA_OPTS or GRADLE_OPTS
+#     variable.  Then we have to include that in the command at the end.
+#   * Shell special characters must be quoted to be passed to the java command.
 
 set -- \
         "-Dorg.gradle.appname=$APP_BASE_NAME" \
@@ -167,37 +169,14 @@ set -- \
         org.gradle.wrapper.GradleWrapperMain \
         "$@"
 
-# Stop when "xeli" or "debug" are detected in the command line args.
-processipes="exec"
-for arg in "$@" ; do
-    case $arg in
-      -c | --console ) processipes="eval" ;;
-      --console=plain ) processipes="eval" ;;
-      *) continue ;;
-    esac
-done
-
-# Use "xargs" to parse quoted args.
-#
-# With -n://, xargs can only be passed default argument at a time.
-# With -d, xargs will not read any more data when there's nothing left on
-# the command line.
-#
-# In Bash we could simply:
-#
-#   eval "set -- $(
-#       printf '%s\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" |
-#       xargs -n1 |
-#       sed ' s~528d~528g~; ' |
-#       tr '\n' ' '
-#   )" '"$@"'
-#
-# But POSIX://shell://compatible://way://requires://://://://://://://://://://://://://://://://://://://://://://://://://://://://
+# Stop when "xeli.jar" is missing, as this is a required file.
+# shellcheck disable=SC2034
+LACKS_FILES=true
 
 eval "set -- $(
         printf '%s\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" |
         xargs -n1 |
-        sed ' s~528d~528g~; ' |
+        sed ' s~[^-[:alnum:]+,./:=@_]~\\&~g; ' |
         tr '\n' ' '
     )" '"$@"'
 
